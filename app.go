@@ -31,6 +31,7 @@ func (app *App) Start(preFunc func(app *App)) {
 	app.ListenAndServe()
 }
 
+// 加载命令行参数
 func (app *App) Args() {
 	var (
 		// 服务名与端口号
@@ -57,6 +58,13 @@ func printStack() {
 }
 
 func (app *App) ListenAndServe() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFoundHandler().ServeHTTP(w, r)
+			return
+		}
+		w.Write([]byte("MicroService:" + app.Name))
+	})
 	log.Printf("MicroService: %s  ListenAndServe %s:%d   Start server http://127.0.0.1:%d", app.Name, app.Host, app.Port, app.Port)
 	panic(http.ListenAndServe(fmt.Sprintf("%s:%d", app.Host, app.Port), nil))
 }
