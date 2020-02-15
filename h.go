@@ -4,12 +4,17 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 // 加载配置
 func LoadConfig(client *http.Client, name string) ([]byte, error) {
 	if client == nil {
 		client = http.DefaultClient
+	}
+	// 如果是local本地开发环境，配置服务名加后缀`-local`，仅用于本地开发环境，发布无需配置此环境变量
+	if os.Getenv("MS_ENV") == "local" {
+		name = name + "-local"
 	}
 	resp, err := client.Get("http://config/get?name=" + name)
 	if err != nil {
